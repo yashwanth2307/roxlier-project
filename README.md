@@ -1,67 +1,56 @@
-# Store Rating Platform - Developer Notes
+# Store Rating Platform
 
-This document is for your personal understanding of the codebase and technology stack used in the project.
+A full-stack web app where users can rate stores. Built with NestJS + PostgreSQL on the backend and React on the frontend.
 
-## Technology Stack
+## Tech Stack
 
-### Backend
-- **Framework**: [NestJS](https://nestjs.com/) (A progressive Node.js framework for building efficient, scalable server-side applications)
-- **Language**: TypeScript
-- **Database**: PostgreSQL
-- **ORM (Object-Relational Mapping)**: [TypeORM](https://typeorm.io/) (Used to interact with PostgreSQL using TypeScript classes instead of raw SQL queries)
-- **Authentication**: JWT (JSON Web Tokens) using `@nestjs/passport` and `passport-jwt`
-- **Security & Hashing**: `bcrypt` (for securely hashing user passwords before saving them to the database)
-- **Validation**: `class-validator` and `class-transformer` (for validating incoming data like email formats and password strength)
+**Backend:** NestJS, TypeORM, PostgreSQL, JWT auth with Passport, bcrypt  
+**Frontend:** React (Vite), axios, react-router-dom, vanilla CSS
 
-### Frontend
-- **Framework**: [React](https://react.dev/)
-- **Build Tool**: [Vite](https://vitejs.dev/) (Extremely fast frontend build tool)
-- **Language**: JavaScript (JSX)
-- **Routing**: `react-router-dom` (For handling navigation between pages without reloading the browser)
-- **HTTP Client**: `axios` (For making API requests to the NestJS backend)
-- **Styling**: Vanilla CSS (Using CSS variables for consistent theming and a clean, dependency-free design)
+## Project Structure
 
----
+```
+backend/
+  src/
+    auth/         - login, signup, JWT, role guards
+    users/        - user CRUD, filtering, sorting
+    stores/       - store CRUD, avg rating calculation
+    ratings/      - submit/update ratings
+    
+frontend/
+  src/
+    pages/        - Login, Signup, AdminDashboard, UserStores, etc.
+    components/   - Navbar, UserTable, StoreTable, RatingStars, etc.
+    context/      - AuthContext (manages logged-in state)
+    helpers/      - axios config, form validators
+```
 
-## Codebase Structure
+## How to Run
 
-### Backend Architecture (`backend/src/`)
-NestJS follows a modular architecture. Each feature is encapsulated in its own module:
+1. Make sure PostgreSQL is running and create a database called `store_ratings`
+2. Update `backend/.env` with your DB credentials
 
-1. **Auth Module (`auth/`)**: 
-   - Handles login, signup, password changing, and JWT verification.
-   - Contains the `RolesGuard` which checks if a user has permission (Admin, Owner, Normal User) to access specific routes.
-2. **Users Module (`users/`)**: 
-   - Defines the `User` entity (database table).
-   - Handles listing, filtering, and creating users.
-3. **Stores Module (`stores/`)**: 
-   - Defines the `Store` entity.
-   - Handles creating and listing stores. Includes logic for the "Owner Dashboard" to find stores assigned to a specific owner.
-4. **Ratings Module (`ratings/`)**: 
-   - Defines the `Rating` entity.
-   - Handles submitting new ratings, updating existing ones, and calculating the average rating for a store.
+```bash
+cd backend
+npm install
+npm run start:dev
+```
 
-### Frontend Architecture (`frontend/src/`)
-React is structured into reusable components and pages:
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-1. **Pages (`pages/`)**: 
-   - These represent full screens (e.g., `Login.jsx`, `AdminDashboard.jsx`, `UserStores.jsx`).
-   - Each page is mapped to a URL in `App.jsx`.
-2. **Components (`components/`)**: 
-   - Reusable UI blocks like `Navbar.jsx`, `StoreTable.jsx`, and `RatingStars.jsx`.
-   - `ProtectedRoute.jsx` wraps around pages to prevent unauthorized access (e.g., kicking a normal user out of the Admin dashboard).
-3. **Context (`context/`)**: 
-   - `AuthContext.jsx` holds the global authentication state. It stores the currently logged-in user and their JWT token in `localStorage` so they stay logged in after refreshing the page.
-4. **Helpers (`helpers/`)**: 
-   - `api.js` configures `axios` to automatically attach the JWT token to every request sent to the backend.
+Backend runs on `http://localhost:3000`, frontend on `http://localhost:5173`
 
----
+## Default Admin
 
-## How Data Flows
+Email: `admin@admin.com`  
+Password: `Admin@123`
 
-1. **User Action**: The user clicks a button on the frontend (e.g., "Submit Rating").
-2. **API Call**: React uses `axios` to send a `POST` request to `http://localhost:3000/ratings`.
-3. **Backend Authentication**: NestJS receives the request, verifies the JWT token (to ensure the user is logged in), and checks their role.
-4. **Service Logic**: The Controller passes data to the Service, which uses TypeORM to save the rating into PostgreSQL.
-5. **Response**: The backend sends a success response back to React.
-6. **UI Update**: React updates the UI to show the new average rating.
+Gets created automatically on first startup.
+
+## Database
+
+Three main tables — `users`, `stores`, `ratings`. Users have roles (admin/user/owner). Stores can have an owner. Ratings link a user to a store with a value from 1–5. There's a unique constraint so each user can only rate a store once.
