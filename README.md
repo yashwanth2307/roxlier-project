@@ -4,8 +4,8 @@ A full-stack web app where users can rate stores. Built with NestJS + PostgreSQL
 
 ## Tech Stack
 
-**Backend:** NestJS, TypeORM, PostgreSQL, JWT auth with Passport, bcrypt  
-**Frontend:** React (Vite), axios, react-router-dom, vanilla CSS
+**Backend:** NestJS (uses TypeScript because the framework requires it for decorators), TypeORM, PostgreSQL, JWT auth with Passport, bcrypt  
+**Frontend:** React (Vite), JavaScript, axios, react-router-dom, vanilla CSS
 
 ## Project Structure
 
